@@ -35,7 +35,11 @@ package io.pmem.pmemkv;
 import io.pmem.pmemkv.internal.GetKeysBuffersJNICallback;
 import io.pmem.pmemkv.internal.GetAllBufferJNICallback;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.Iterator;
 
 public class Database {
 
@@ -135,15 +139,51 @@ public class Database {
     }
 
     public long countBetween(ByteBuffer key1, ByteBuffer key2) {
-        return database_count_between_buffer(pointer, key1.position(), key1, key2.position(), key2);
+        boolean isEmpty1 = key1 == null || key1.remaining() == 0;
+        boolean isEmpty2 = key2 == null || key2.remaining() == 0;
+        if (isEmpty1 && isEmpty2) {
+            // should never happen
+            return 0L;
+        }
+        if (isEmpty1) {
+            return database_count_below_buffer(pointer, key2.position(), key2);
+        } else if (isEmpty2) {
+            return database_count_above_buffer(pointer, key1.position(), key1);
+        } else {
+            return database_count_between_buffer(pointer, key1.position(), key1, key2.position(), key2);
+        }
     }
 
     public long countBetween(byte[] key1, byte[] key2) {
-        return database_count_between_bytes(pointer, key1, key2);
+        boolean isEmpty1 = key1 == null || key1.length == 0;
+        boolean isEmpty2 = key2 == null || key2.length == 0;
+        if (isEmpty1 && isEmpty2) {
+            // should never happen
+            return 0L;
+        }
+        if (isEmpty1) {
+            return database_count_below_bytes(pointer, key2);
+        } else if (isEmpty2) {
+            return database_count_above_bytes(pointer, key1);
+        } else {
+            return database_count_between_bytes(pointer, key1, key2);
+        }
     }
 
     public long countBetween(String key1, String key2) {
-        return database_count_between_bytes(pointer, key1.getBytes(), key2.getBytes());
+        boolean isEmpty1 = key1 == null || key1.length() == 0;
+        boolean isEmpty2 = key2 == null || key2.length() == 0;
+        if (isEmpty1 && isEmpty2) {
+            // should never happen
+            return 0L;
+        }
+        if (isEmpty1) {
+            return database_count_below_bytes(pointer, key2.getBytes());
+        } else if (isEmpty2) {
+            return database_count_above_bytes(pointer, key1.getBytes());
+        } else {
+            return database_count_between_bytes(pointer, key1.getBytes(), key2.getBytes());
+        }
     }
 
     public void get_all(GetAllBufferCallback callback) {
@@ -186,16 +226,52 @@ public class Database {
     }
 
     public void get_between(ByteBuffer key1, ByteBuffer key2, GetAllBufferCallback callback) {
-        database_get_between_buffer(pointer, key1.position(), key1, key2.position(), key2, (int kb, ByteBuffer k, int vb, ByteBuffer v)
-                -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
+        boolean isEmpty1 = key1 == null || key1.remaining() == 0;
+        boolean isEmpty2 = key2 == null || key2.remaining() == 0;
+        if (isEmpty1 && isEmpty2) {
+            // should never happen
+            return;
+        }
+        if (isEmpty1) {
+            get_below(key2, callback);
+        } else if (isEmpty2) {
+            get_above(key1, callback);
+        } else {
+            database_get_between_buffer(pointer, key1.position(), key1, key2.position(), key2, (int kb, ByteBuffer k, int vb, ByteBuffer v)
+                    -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
+        }
     }
 
     public void get_between(byte[] key1, byte[] key2, GetAllByteArrayCallback callback) {
-        database_get_between_bytes(pointer, key1, key2, callback);
+        boolean isEmpty1 = key1 == null || key1.length == 0;
+        boolean isEmpty2 = key2 == null || key2.length == 0;
+        if (isEmpty1 && isEmpty2) {
+            // should never happen
+            return;
+        }
+        if (isEmpty1) {
+            get_below(key2, callback);
+        } else if (isEmpty2) {
+            get_above(key1, callback);
+        } else {
+            database_get_between_bytes(pointer, key1, key2, callback);
+        }
     }
 
     public void get_between(String key1, String key2, GetAllStringCallback callback) {
-        database_get_between_string(pointer, key1.getBytes(), key2.getBytes(), callback);
+        boolean isEmpty1 = key1 == null || key1.length() == 0;
+        boolean isEmpty2 = key2 == null || key2.length() == 0;
+        if (isEmpty1 && isEmpty2) {
+            // should never happen
+            return;
+        }
+        if (isEmpty1) {
+            get_below(key2, callback);
+        } else if (isEmpty2) {
+            get_above(key1, callback);
+        } else {
+            database_get_between_string(pointer, key1.getBytes(), key2.getBytes(), callback);
+        }
     }
 
     public boolean exists(ByteBuffer key) {
@@ -279,6 +355,66 @@ public class Database {
         }
     }
 
+    public BytesIterator iterator() {
+        return new BytesIterator(pointer);
+    }
+
+    public class BytesIterator implements Closeable {
+        private final long db_pointer;
+        private final long iterator_pointer;
+
+        public BytesIterator(final long db_pointer) {
+            this.db_pointer = db_pointer;
+            this.iterator_pointer = database_iterator_new(db_pointer);
+        }
+
+        public void next() {
+            database_iterator_next(db_pointer, iterator_pointer);
+        }
+
+        public void prev() {
+                database_iterator_prev(db_pointer, iterator_pointer);
+        }
+
+        public void seekToFirst() {
+            database_iterator_seek_to_first(db_pointer, iterator_pointer);
+        }
+
+        public void seekToLast() {
+            database_iterator_seek_to_last(db_pointer, iterator_pointer);
+        }
+
+        public void seek(final byte[] target) {
+            database_iterator_seek(db_pointer, iterator_pointer, target);
+        }
+
+        public void seekForPrev(final byte[] target) {
+            database_iterator_seek_for_prev(db_pointer, iterator_pointer, target);
+        }
+
+        public void seekForNext(final byte[] target) {
+            database_iterator_seek_for_next(db_pointer, iterator_pointer, target);
+        }
+
+        public boolean isValid() {
+            return database_iterator_is_valid(db_pointer, iterator_pointer);
+        }
+
+        public byte[] key() {
+            return database_iterator_key_bytes(db_pointer, iterator_pointer);
+        }
+
+        public byte[] value() {
+            return database_iterator_value_bytes(db_pointer, iterator_pointer);
+        }
+
+        @Override
+        public void close() {
+            database_iterator_delete(pointer, iterator_pointer);
+        }
+
+    }
+
     private final long pointer;
     private boolean stopped;
 
@@ -325,6 +461,19 @@ public class Database {
     private native void database_put_bytes(long ptr, byte[] k, byte[] v);
     private native boolean database_remove_buffer(long ptr, int kb, ByteBuffer k);
     private native boolean database_remove_bytes(long ptr, byte[] k);
+
+    private native long database_iterator_new(long ptr);
+    private native void database_iterator_next(long ptr, long it_ptr);
+    private native void database_iterator_prev(long ptr, long it_ptr);
+    private native void database_iterator_seek_to_first(long ptr, long it_ptr);
+    private native void database_iterator_seek_to_last(long ptr, long it_ptr);
+    private native void database_iterator_seek(long ptr, long it_ptr, byte[] k);
+    private native void database_iterator_seek_for_prev(long ptr, long it_ptr, byte[] k);
+    private native void database_iterator_seek_for_next(long ptr, long it_ptr, byte[] k);
+    private native boolean database_iterator_is_valid(long ptr, long it_ptr);
+    private native byte[] database_iterator_key_bytes(long ptr, long it_ptr);
+    private native byte[] database_iterator_value_bytes(long ptr, long it_ptr);
+    private native void database_iterator_delete(long ptr, long it_ptr);
 
     static {
         System.loadLibrary("pmemkv-jni");
