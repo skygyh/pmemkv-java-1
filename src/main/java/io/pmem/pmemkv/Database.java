@@ -84,6 +84,32 @@ public class Database {
         database_get_keys_above_string(pointer, key.getBytes(), callback);
     }
 
+    public void getKeysEqualAbove(ByteBuffer key, GetKeysBuffersCallback callback) {
+        database_get_keys_equal_above_buffer(pointer, key.position(), key, (int kb, ByteBuffer k)
+                -> callback.process((ByteBuffer) k.rewind().limit(kb)));
+    }
+
+    public void getKeysEqualAbove(byte[] key, GetKeysByteArraysCallback callback) {
+        database_get_keys_equal_above_bytes(pointer, key, callback);
+    }
+
+    public void getKeysEqualAbove(String key, GetKeysStringsCallback callback) {
+        database_get_keys_equal_above_string(pointer, key.getBytes(), callback);
+    }
+
+    public void getKeysEqualBelow(ByteBuffer key, GetKeysBuffersCallback callback) {
+        database_get_keys_equal_below_buffer(pointer, key.position(), key, (int kb, ByteBuffer k)
+                -> callback.process((ByteBuffer) k.rewind().limit(kb)));
+    }
+
+    public void getKeysEqualBelow(byte[] key, GetKeysByteArraysCallback callback) {
+        database_get_keys_equal_below_bytes(pointer, key, callback);
+    }
+
+    public void getKeysEqualBelow(String key, GetKeysStringsCallback callback) {
+        database_get_keys_equal_below_string(pointer, key.getBytes(), callback);
+    }
+
     public void getKeysBelow(ByteBuffer key, GetKeysBuffersCallback callback) {
         database_get_keys_below_buffer(pointer, key.position(), key, (int kb, ByteBuffer k)
                 -> callback.process((ByteBuffer) k.rewind().limit(kb)));
@@ -126,6 +152,18 @@ public class Database {
         return database_count_above_bytes(pointer, key.getBytes());
     }
 
+    public long countEqualAbove(ByteBuffer key) {
+        return database_count_equal_above_buffer(pointer, key.position(), key);
+    }
+
+    public long countEqualAbove(byte[] key) {
+        return database_count_equal_above_bytes(pointer, key);
+    }
+
+    public long countEqualAbove(String key) {
+        return database_count_equal_above_bytes(pointer, key.getBytes());
+    }
+
     public long countBelow(ByteBuffer key) {
         return database_count_below_buffer(pointer, key.position(), key);
     }
@@ -136,6 +174,18 @@ public class Database {
 
     public long countBelow(String key) {
         return database_count_below_bytes(pointer, key.getBytes());
+    }
+
+    public long countEqualBelow(ByteBuffer key) {
+        return database_count_equal_below_buffer(pointer, key.position(), key);
+    }
+
+    public long countEqualBelow(byte[] key) {
+        return database_count_equal_below_bytes(pointer, key);
+    }
+
+    public long countEqualBelow(String key) {
+        return database_count_equal_below_bytes(pointer, key.getBytes());
     }
 
     public long countBetween(ByteBuffer key1, ByteBuffer key2) {
@@ -212,6 +262,19 @@ public class Database {
         database_get_above_string(pointer, key.getBytes(), callback);
     }
 
+    public void get_equal_above(ByteBuffer key, GetAllBufferCallback callback) {
+        database_get_equal_above_buffer(pointer, key.position(), key, (int kb, ByteBuffer k, int vb, ByteBuffer v)
+                -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
+    }
+
+    public void get_equal_above(byte[] key, GetAllByteArrayCallback callback) {
+        database_get_equal_above_bytes(pointer, key, callback);
+    }
+
+    public void get_equal_above(String key, GetAllStringCallback callback) {
+        database_get_equal_above_string(pointer, key.getBytes(), callback);
+    }
+
     public void get_below(ByteBuffer key, GetAllBufferCallback callback) {
         database_get_below_buffer(pointer, key.position(), key, (int kb, ByteBuffer k, int vb, ByteBuffer v)
                 -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
@@ -223,6 +286,19 @@ public class Database {
 
     public void get_below(String key, GetAllStringCallback callback) {
         database_get_below_string(pointer, key.getBytes(), callback);
+    }
+
+    public void get_equal_below(ByteBuffer key, GetAllBufferCallback callback) {
+        database_get_equal_below_buffer(pointer, key.position(), key, (int kb, ByteBuffer k, int vb, ByteBuffer v)
+                -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
+    }
+
+    public void get_equal_below(byte[] key, GetAllByteArrayCallback callback) {
+        database_get_equal_below_bytes(pointer, key, callback);
+    }
+
+    public void get_equal_below(String key, GetAllStringCallback callback) {
+        database_get_equal_below_string(pointer, key.getBytes(), callback);
     }
 
     public void get_between(ByteBuffer key1, ByteBuffer key2, GetAllBufferCallback callback) {
@@ -428,6 +504,12 @@ public class Database {
     private native void database_get_keys_above_buffer(long ptr, int kb, ByteBuffer k, GetKeysBuffersJNICallback cb);
     private native void database_get_keys_above_bytes(long ptr, byte[] k, GetKeysByteArraysCallback cb);
     private native void database_get_keys_above_string(long ptr, byte[] k, GetKeysStringsCallback cb);
+    private native void database_get_keys_equal_above_buffer(long ptr, int kb, ByteBuffer k, GetKeysBuffersJNICallback cb);
+    private native void database_get_keys_equal_above_bytes(long ptr, byte[] k, GetKeysByteArraysCallback cb);
+    private native void database_get_keys_equal_above_string(long ptr, byte[] k, GetKeysStringsCallback cb);
+    private native void database_get_keys_equal_below_buffer(long ptr, int kb, ByteBuffer k, GetKeysBuffersJNICallback cb);
+    private native void database_get_keys_equal_below_bytes(long ptr, byte[] k, GetKeysByteArraysCallback cb);
+    private native void database_get_keys_equal_below_string(long ptr, byte[] k, GetKeysStringsCallback cb);
     private native void database_get_keys_below_buffer(long ptr, int kb, ByteBuffer k, GetKeysBuffersJNICallback cb);
     private native void database_get_keys_below_bytes(long ptr, byte[] k, GetKeysByteArraysCallback cb);
     private native void database_get_keys_below_string(long ptr, byte[] k, GetKeysStringsCallback cb);
@@ -437,6 +519,10 @@ public class Database {
     private native long database_count_all(long ptr);
     private native long database_count_above_buffer(long ptr, int kb, ByteBuffer k);
     private native long database_count_above_bytes(long ptr, byte[] k);
+    private native long database_count_equal_above_buffer(long ptr, int kb, ByteBuffer k);
+    private native long database_count_equal_above_bytes(long ptr, byte[] k);
+    private native long database_count_equal_below_buffer(long ptr, int kb, ByteBuffer k);
+    private native long database_count_equal_below_bytes(long ptr, byte[] k);
     private native long database_count_below_buffer(long ptr, int kb, ByteBuffer k);
     private native long database_count_below_bytes(long ptr, byte[] k);
     private native long database_count_between_buffer(long ptr, int kb1, ByteBuffer k1, int kb2, ByteBuffer k2);
@@ -447,9 +533,15 @@ public class Database {
     private native void database_get_above_buffer(long ptr, int kb, ByteBuffer k, GetAllBufferJNICallback cb);
     private native void database_get_above_bytes(long ptr, byte[] k, GetAllByteArrayCallback cb);
     private native void database_get_above_string(long ptr, byte[] k, GetAllStringCallback cb);
+    private native void database_get_equal_above_buffer(long ptr, int kb, ByteBuffer k, GetAllBufferJNICallback cb);
+    private native void database_get_equal_above_bytes(long ptr, byte[] k, GetAllByteArrayCallback cb);
+    private native void database_get_equal_above_string(long ptr, byte[] k, GetAllStringCallback cb);
     private native void database_get_below_buffer(long ptr, int kb, ByteBuffer k, GetAllBufferJNICallback cb);
     private native void database_get_below_bytes(long ptr, byte[] k, GetAllByteArrayCallback cb);
     private native void database_get_below_string(long ptr, byte[] k, GetAllStringCallback cb);
+    private native void database_get_equal_below_buffer(long ptr, int kb, ByteBuffer k, GetAllBufferJNICallback cb);
+    private native void database_get_equal_below_bytes(long ptr, byte[] k, GetAllByteArrayCallback cb);
+    private native void database_get_equal_below_string(long ptr, byte[] k, GetAllStringCallback cb);
     private native void database_get_between_buffer(long ptr, int kb1, ByteBuffer k1, int kb2, ByteBuffer k2, GetAllBufferJNICallback cb);
     private native void database_get_between_bytes(long ptr, byte[] k1, byte[] k2, GetAllByteArrayCallback cb);
     private native void database_get_between_string(long ptr, byte[] k1, byte[] k2, GetAllStringCallback cb);
@@ -461,7 +553,6 @@ public class Database {
     private native void database_put_bytes(long ptr, byte[] k, byte[] v);
     private native boolean database_remove_buffer(long ptr, int kb, ByteBuffer k);
     private native boolean database_remove_bytes(long ptr, byte[] k);
-
     private native long database_iterator_new(long ptr);
     private native void database_iterator_next(long ptr, long it_ptr);
     private native void database_iterator_prev(long ptr, long it_ptr);
