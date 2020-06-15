@@ -134,15 +134,27 @@ public class BasicExample {
                      public void run() {
                          System.out.println("start to insert key into csmap");
                          for(int i = 0; i < 1000; i++) {
-                             String key= "key" + i;
-                             String value = "value" + i;
+                             String key= "key" + 2*i +1 ;
+                             String value = "value" + 2*i + 1;
                              db.put(key, value);
+                      }
+                     }
+                 }).start();
 
-
+                 new Thread(new Runnable() {
+                     @Override
+                     public void run() {
+                         System.out.println("start to insert key into csmap");
+                         for(int i = 0; i < 1000; i++) {
+                             String key= "key" + 2*i;
+                             String value = "value" + 2* i;
+                             db.put(key, value);
                          }
                      }
                  }).start();
+
              }
+
             try (Database.BytesIterator it = db.iterator()) {
                 while (it.isValid()) {
                     byte[] key = it.key();
