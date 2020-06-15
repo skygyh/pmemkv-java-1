@@ -70,7 +70,7 @@ public class BasicExample {
         db.put("key3", "value3");
         db.getKeys((String k) -> System.out.println("  visited: " + k));
 
-        // for stree only:  range query and iterator
+        // range query and iterator
         if (engine.equals("stree") || engine.equals("csmap")) {
             final List<String> keys = new ArrayList<>();
             final List<String> values = new ArrayList<>();
@@ -128,7 +128,21 @@ public class BasicExample {
                 assert db.countBetween("key1", "key3") == 1;
             }
 
+             if (engine.equals("csmap"))  {
+                 new Thread(new Runnable() {
+                     @Override
+                     public void run() {
+                         System.out.println("start to insert key into csmap");
+                         for(int i = 0; i < 1000; i++) {
+                             String key= "key" + i;
+                             String value = "value" + i;
+                             db.put(key, value);
 
+
+                         }
+                     }
+                 }).start();
+             }
             try (Database.BytesIterator it = db.iterator()) {
                 while (it.isValid()) {
                     byte[] key = it.key();
