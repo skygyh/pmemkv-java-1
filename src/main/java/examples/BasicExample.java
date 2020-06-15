@@ -13,7 +13,7 @@ public class BasicExample {
     private static final String PMEM_ROOT_PATH = "/mnt/mem";
     private static final int PMEM_SIZE = 1073741824 / 16;
     public static void main(String[] args) {
-        String[] supportedEngines = new String [] {"cmap", "vsmap", "vcmap", "tree3", "stree"};
+        String[] supportedEngines = new String [] {"cmap", "vsmap", "vcmap", "csmap", "stree"};
         for (String engine : supportedEngines) {
             System.out.println("Starting engine " + engine);
             try {
@@ -71,7 +71,7 @@ public class BasicExample {
         db.getKeys((String k) -> System.out.println("  visited: " + k));
 
         // for stree only:  range query and iterator
-        if (engine.equals("stree")) {
+        if (engine.equals("stree") || engine.equals("csmap")) {
             final List<String> keys = new ArrayList<>();
             final List<String> values = new ArrayList<>();
             assert db.countAbove("key1") == 2;
