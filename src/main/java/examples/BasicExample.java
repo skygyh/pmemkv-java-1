@@ -54,7 +54,7 @@ public class BasicExample {
         }
         return confStr.toString();
     }
-    private static void runEngine(String engine, String confStr) {
+    private static void runEngine(String engine, String confStr) throws InterruptedException {
         System.out.println(String.format("Loading Engine %s @ %s", engine, confStr));
         Database db = new Database(engine, confStr);
 
@@ -154,6 +154,19 @@ public class BasicExample {
                  }).start();
 
              }
+
+             Thread.sleep(1000);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    System.out.println("start to remove key from csmap");
+                    for(int i = 0; i < 1000; i++) {
+                        String key= "key" + 2*i;
+                        String value = "value" + 2* i;
+                        db.remove(key);
+                    }
+                }
+            }).start();
 
             try (Database.BytesIterator it = db.iterator()) {
                 while (it.isValid()) {
