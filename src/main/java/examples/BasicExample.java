@@ -165,7 +165,7 @@ public class BasicExample {
                     it.next();
                 }
 
-                assert db.countAll() == 0;
+                //assert db.countAll() == 0;
 
                     it.seek("key1".getBytes());
                     System.out.println(String.format("seek to key1 : %s:%s  ", new String(it.key()), new String(it.value())));
