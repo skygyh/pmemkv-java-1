@@ -13,7 +13,8 @@ public class BasicExample {
     private static final String PMEM_ROOT_PATH = "/mnt/mem";
     private static final int PMEM_SIZE = 1073741824 / 16;
     public static void main(String[] args) {
-        String[] supportedEngines = new String [] {"cmap", "vsmap", "vcmap", "stree", "csmap"};
+//        String[] supportedEngines = new String [] {"cmap", "vsmap", "vcmap", "stree", "csmap"};
+        String[] supportedEngines = new String [] {"cmap", "vsmap", "vcmap",  "csmap"};
         for (String engine : supportedEngines) {
             System.out.println("Starting engine " + engine);
             try {
@@ -163,6 +164,7 @@ public class BasicExample {
                     System.out.println(String.format("Iterating [%s:%s] ", new String(key), new String(value)));
                     it.next();
                 }
+
                 assert db.countAll() == 0;
 
                     it.seek("key1".getBytes());
