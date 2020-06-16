@@ -14,7 +14,7 @@ public class BasicExample {
     private static final int PMEM_SIZE = 1073741824 / 16;
     public static void main(String[] args) {
 //        String[] supportedEngines = new String [] {"cmap", "vsmap", "vcmap", "stree", "csmap"};
-        String[] supportedEngines = new String [] {"cmap", "vsmap", "vcmap",  "csmap"};
+        String[] supportedEngines = new String [] { "csmap"};
         for (String engine : supportedEngines) {
             System.out.println("Starting engine " + engine);
             try {
@@ -58,7 +58,7 @@ public class BasicExample {
     private static void runEngine(String engine, String confStr) throws InterruptedException {
         System.out.println(String.format("Loading Engine %s @ %s", engine, confStr));
         Database db = new Database(engine, confStr);
-
+        Thread T = null;
         System.out.println("Putting new key");
         db.put("key1", "value1");
         assert db.countAll() == 1;
@@ -129,7 +129,7 @@ public class BasicExample {
                 assert db.countBetween("key1", "key3") == 1;
             }
 
-             if (engine.equals("csmap"))  {
+            if (engine.equals("csmap"))  {
                  new Thread(new Runnable() {
                      @Override
                      public void run() {
@@ -143,7 +143,7 @@ public class BasicExample {
                  }).start();
 
                  Thread.sleep(1000);
-                 new Thread(new Runnable() {
+                T =  new Thread(new Runnable() {
                      @Override
                      public void run() {
                          System.out.println("start to remove key from csmap");
@@ -154,7 +154,8 @@ public class BasicExample {
                              System.out.println("removed key:" + key);
                          }
                      }
-                 }).start();
+                 });
+                 T.start();
              }
 
             try (Database.BytesIterator it = db.iterator()) {
@@ -197,16 +198,14 @@ public class BasicExample {
 //                    System.out.println(String.format("seek to key2's next : %s:%s  ", new String(it.key()), new String(it.value())));
 //                    it.seekForNext("key3".getBytes());
 //                    System.out.println(String.format("seek to key3's next : %s:%s  ", new String(it.key()), new String(it.value())));
-
             } finally {
                 System.out.println("Done iterator!");
             }
         }
 
-        System.out.println("Removing existing key");
-        db.remove("key1");
-        assert !db.exists("key1");
-
+        if (T != null) {
+            T.join();
+        }
         System.out.println("Stopping engine");
         db.stop();
     }
