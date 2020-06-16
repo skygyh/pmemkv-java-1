@@ -152,21 +152,22 @@ public class BasicExample {
                          }
                      }
                  }).start();
+                 
+                 Thread.sleep(1000);
+                 new Thread(new Runnable() {
+                     @Override
+                     public void run() {
+                         System.out.println("start to remove key from csmap");
+                         for(int i = 0; i < 1000; i++) {
+                             String key= "key" + 2*i;
+                             String value = "value" + 2* i;
+                             db.remove(key);
+                         }
+                     }
+                 }).start();
+
 
              }
-
-             Thread.sleep(1000);
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    System.out.println("start to remove key from csmap");
-                    for(int i = 0; i < 1000; i++) {
-                        String key= "key" + 2*i;
-                        String value = "value" + 2* i;
-                        db.remove(key);
-                    }
-                }
-            }).start();
 
             try (Database.BytesIterator it = db.iterator()) {
                 while (it.isValid()) {
