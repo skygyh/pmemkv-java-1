@@ -134,39 +134,26 @@ public class BasicExample {
                      public void run() {
                          System.out.println("start to insert key into csmap");
                          for(int i = 0; i < 1000; i++) {
-                             String key= "key" + 2*i +1 ;
-                             String value = "value" + 2*i + 1;
+                             String key= "key" + i ;
+                             String value = "value" + i;
                              db.put(key, value);
                       }
                      }
                  }).start();
 
-                 new Thread(new Runnable() {
-                     @Override
-                     public void run() {
-                         System.out.println("start to insert key into csmap");
-                         for(int i = 0; i < 1000; i++) {
-                             String key= "key" + 2*i;
-                             String value = "value" + 2* i;
-                             db.put(key, value);
-                         }
-                     }
-                 }).start();
-                 
                  Thread.sleep(1000);
                  new Thread(new Runnable() {
                      @Override
                      public void run() {
                          System.out.println("start to remove key from csmap");
                          for(int i = 0; i < 1000; i++) {
-                             String key= "key" + 2*i;
-                             String value = "value" + 2* i;
+                             String key= "key" + i;
+                             String value = "value" + i;
                              db.remove(key);
+                             System.out.println("removed key:" + key);
                          }
                      }
                  }).start();
-
-
              }
 
             try (Database.BytesIterator it = db.iterator()) {
@@ -176,37 +163,39 @@ public class BasicExample {
                     System.out.println(String.format("Iterating [%s:%s] ", new String(key), new String(value)));
                     it.next();
                 }
+                assert db.countAll() == 0;
 
-                it.seek("key1".getBytes());
-                System.out.println(String.format("seek to key1 : %s:%s  ", new String(it.key()), new String(it.value())));
-                it.seek("key2".getBytes());
-                System.out.println(String.format("seek to key2 : %s:%s  ", new String(it.key()), new String(it.value())));
-                it.seek("key3".getBytes());
-                System.out.println(String.format("seek to key3 : %s:%s  ", new String(it.key()), new String(it.value())));
+                    it.seek("key1".getBytes());
+                    System.out.println(String.format("seek to key1 : %s:%s  ", new String(it.key()), new String(it.value())));
+                    it.seek("key2".getBytes());
+                    System.out.println(String.format("seek to key2 : %s:%s  ", new String(it.key()), new String(it.value())));
+                    it.seek("key3".getBytes());
+                    System.out.println(String.format("seek to key3 : %s:%s  ", new String(it.key()), new String(it.value())));
 
-                it.seekToFirst();
-                System.out.println(String.format("seek to first : %s:%s  ", new String(it.key()), new String(it.value())));
-                it.seekToLast();
-                System.out.println(String.format("seek to last : %s:%s  ", new String(it.key()), new String(it.value())));
+                    it.seekToFirst();
+                    System.out.println(String.format("seek to first : %s:%s  ", new String(it.key()), new String(it.value())));
+                    //it.seekToLast();
+                   // System.out.println(String.format("seek to last : %s:%s  ", new String(it.key()), new String(it.value())));
 
-                it.seekForPrev("key1".getBytes());
-                System.out.println(String.format("seek to key1's prev : %s:%s  ", new String(it.key()), new String(it.value())));
-                it.seekForPrev("key2".getBytes());
-                System.out.println(String.format("seek to key2's prev : %s:%s  ", new String(it.key()), new String(it.value())));
-                it.seekForPrev("key3".getBytes());
-                System.out.println(String.format("seek to key3's prev : %s:%s  ", new String(it.key()), new String(it.value())));
+                    it.seekForPrev("key1".getBytes());
+                    System.out.println(String.format("seek to key1's prev : %s:%s  ", new String(it.key()), new String(it.value())));
+                    it.seekForPrev("key2".getBytes());
+                    System.out.println(String.format("seek to key2's prev : %s:%s  ", new String(it.key()), new String(it.value())));
+                    it.seekForPrev("key3".getBytes());
+                    System.out.println(String.format("seek to key3's prev : %s:%s  ", new String(it.key()), new String(it.value())));
 
-                it.prev();
-                System.out.println(String.format("seek to key2's prev : %s:%s  ", new String(it.key()), new String(it.value())));
-                it.prev();
-                System.out.println(String.format("seek to key1's prev : %s:%s  ", new String(it.key()), new String(it.value())));
+                    it.prev();
+                    System.out.println(String.format("seek to key2's prev : %s:%s  ", new String(it.key()), new String(it.value())));
+                    it.prev();
+                    System.out.println(String.format("seek to key1's prev : %s:%s  ", new String(it.key()), new String(it.value())));
 
-                it.seekForNext("key1".getBytes());
-                System.out.println(String.format("seek to key1's next : %s:%s  ", new String(it.key()), new String(it.value())));
-                it.seekForNext("key2".getBytes());
-                System.out.println(String.format("seek to key2's next : %s:%s  ", new String(it.key()), new String(it.value())));
-                it.seekForNext("key3".getBytes());
-                System.out.println(String.format("seek to key3's next : %s:%s  ", new String(it.key()), new String(it.value())));
+                    it.seekForNext("key1".getBytes());
+                    System.out.println(String.format("seek to key1's next : %s:%s  ", new String(it.key()), new String(it.value())));
+                    it.seekForNext("key2".getBytes());
+                    System.out.println(String.format("seek to key2's next : %s:%s  ", new String(it.key()), new String(it.value())));
+                    it.seekForNext("key3".getBytes());
+                    System.out.println(String.format("seek to key3's next : %s:%s  ", new String(it.key()), new String(it.value())));
+
             } finally {
                 System.out.println("Done iterator!");
             }
