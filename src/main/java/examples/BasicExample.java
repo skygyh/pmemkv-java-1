@@ -142,7 +142,6 @@ public class BasicExample {
                      }
                  }).start();
 
-                 Thread.sleep(1000);
                 T =  new Thread(new Runnable() {
                      @Override
                      public void run() {
@@ -158,6 +157,7 @@ public class BasicExample {
                  T.start();
              }
 
+            Thread.sleep(10);
             try (Database.BytesIterator it = db.iterator()) {
                 while (it.isValid()) {
                     byte[] key = it.key();
