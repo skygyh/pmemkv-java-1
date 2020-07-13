@@ -491,6 +491,14 @@ public class Database {
 
     }
 
+    public void get_floor_entry(byte[] key, GetAllByteArrayCallback callback) {
+        database_get_floor_entry_bytes(pointer, key, callback);
+    }
+
+    public void get_ceiling_entry(String key, GetAllByteArrayCallback callback) {
+        database_get_ceiling_entry_bytes(pointer, key.getBytes(), callback);
+    }
+
     private final long pointer;
     private boolean stopped;
 
@@ -566,6 +574,8 @@ public class Database {
     private native byte[] database_iterator_value_bytes(long ptr, long it_ptr);
     private native void database_iterator_delete(long ptr, long it_ptr);
 
+    private native void database_get_floor_entry_bytes(long ptr, byte[] k, GetAllByteArrayCallback cb);
+    private native void database_get_ceiling_entry_bytes(long ptr, byte[] k, GetAllByteArrayCallback cb);
     static {
         System.loadLibrary("pmemkv-jni");
     }
