@@ -13,7 +13,8 @@ public class BasicExample {
     private static final String PMEM_ROOT_PATH = "/mnt/mem";
     private static final int PMEM_SIZE = 1073741824 / 16;
     public static void main(String[] args) {
-        String[] supportedEngines = new String [] {"cmap", "vsmap", "vcmap", "tree3", "stree"};
+//        String[] supportedEngines = new String [] {"cmap", "vsmap", "vcmap", "stree", "csmap"};
+        String[] supportedEngines = new String [] { "csmap"};
         for (String engine : supportedEngines) {
             System.out.println("Starting engine " + engine);
             try {
@@ -54,10 +55,10 @@ public class BasicExample {
         }
         return confStr.toString();
     }
-    private static void runEngine(String engine, String confStr) {
+    private static void runEngine(String engine, String confStr) throws InterruptedException {
         System.out.println(String.format("Loading Engine %s @ %s", engine, confStr));
         Database db = new Database(engine, confStr);
-
+        Thread T = null;
         System.out.println("Putting new key");
         db.put("key1", "value1");
         assert db.countAll() == 1;
@@ -70,8 +71,8 @@ public class BasicExample {
         db.put("key3", "value3");
         db.getKeys((String k) -> System.out.println("  visited: " + k));
 
-        // for stree only:  range query and iterator
-        if (engine.equals("stree")) {
+        // range query and iterator
+        if (engine.equals("stree") || engine.equals("csmap")) {
             final List<String> keys = new ArrayList<>();
             final List<String> values = new ArrayList<>();
             assert db.countAbove("key1") == 2;
@@ -119,13 +120,44 @@ public class BasicExample {
             keys.clear();
             values.clear();
 	    // a bit tricky, lower_bound
-            assert db.countBetween("key1", "key3") == 2;
-            db.get_between("key1", "key3", (k, v) -> {keys.add(k);values.add(v);});
-            assert keys.size() == 2;
-            assert values.size() == 2;
-            assert keys.get(0).equals("key1");
-            assert values.get(0).equals("value1");
+            db.get_between("key1", "key3", (k, v) -> {keys.add(k);values.add(v);
+            System.out.println("get_between  visited key: " + k + "visited value:"+ v );});
 
+            if (engine.equals("stree")) {
+                assert db.countBetween("key1", "key3") == 2;
+            }  else {
+                assert db.countBetween("key1", "key3") == 1;
+            }
+
+            if (engine.equals("csmap"))  {
+                 new Thread(new Runnable() {
+                     @Override
+                     public void run() {
+                         System.out.println("start to insert key into csmap");
+                         for(int i = 0; i < 1000; i++) {
+                             String key= "key" + i ;
+                             String value = "value" + i;
+                             db.put(key, value);
+                      }
+                     }
+                 }).start();
+                 Thread.sleep(1000);
+                T =  new Thread(new Runnable() {
+                     @Override
+                     public void run() {
+                         System.out.println("start to remove key from csmap");
+                         for(int i = 0; i < 1000; i++) {
+                             String key= "key" + i;
+                             String value = "value" + i;
+                             db.remove(key);
+                             System.out.println("removed key:" + key);
+                         }
+                     }
+                 });
+                 T.start();
+             }
+
+            Thread.sleep(10);
             try (Database.BytesIterator it = db.iterator()) {
                 while (it.isValid()) {
                     byte[] key = it.key();
@@ -134,45 +166,46 @@ public class BasicExample {
                     it.next();
                 }
 
-                it.seek("key1".getBytes());
-                System.out.println(String.format("seek to key1 : %s:%s  ", new String(it.key()), new String(it.value())));
-                it.seek("key2".getBytes());
-                System.out.println(String.format("seek to key2 : %s:%s  ", new String(it.key()), new String(it.value())));
-                it.seek("key3".getBytes());
-                System.out.println(String.format("seek to key3 : %s:%s  ", new String(it.key()), new String(it.value())));
 
-                it.seekToFirst();
-                System.out.println(String.format("seek to first : %s:%s  ", new String(it.key()), new String(it.value())));
-                it.seekToLast();
-                System.out.println(String.format("seek to last : %s:%s  ", new String(it.key()), new String(it.value())));
 
-                it.seekForPrev("key1".getBytes());
-                System.out.println(String.format("seek to key1's prev : %s:%s  ", new String(it.key()), new String(it.value())));
-                it.seekForPrev("key2".getBytes());
-                System.out.println(String.format("seek to key2's prev : %s:%s  ", new String(it.key()), new String(it.value())));
-                it.seekForPrev("key3".getBytes());
-                System.out.println(String.format("seek to key3's prev : %s:%s  ", new String(it.key()), new String(it.value())));
-
-                it.prev();
-                System.out.println(String.format("seek to key2's prev : %s:%s  ", new String(it.key()), new String(it.value())));
-                it.prev();
-                System.out.println(String.format("seek to key1's prev : %s:%s  ", new String(it.key()), new String(it.value())));
-
-                it.seekForNext("key1".getBytes());
-                System.out.println(String.format("seek to key1's next : %s:%s  ", new String(it.key()), new String(it.value())));
-                it.seekForNext("key2".getBytes());
-                System.out.println(String.format("seek to key2's next : %s:%s  ", new String(it.key()), new String(it.value())));
-                it.seekForNext("key3".getBytes());
-                System.out.println(String.format("seek to key3's next : %s:%s  ", new String(it.key()), new String(it.value())));
+//                    it.seek("key1".getBytes());
+//                    System.out.println(String.format("seek to key1 : %s:%s  ", new String(it.key()), new String(it.value())));
+//                    it.seek("key2".getBytes());
+//                    System.out.println(String.format("seek to key2 : %s:%s  ", new String(it.key()), new String(it.value())));
+//                    it.seek("key3".getBytes());
+//                    System.out.println(String.format("seek to key3 : %s:%s  ", new String(it.key()), new String(it.value())));
+//
+//                    it.seekToFirst();
+//                    System.out.println(String.format("seek to first : %s:%s  ", new String(it.key()), new String(it.value())));
+//                    it.seekToLast();
+//                    System.out.println(String.format("seek to last : %s:%s  ", new String(it.key()), new String(it.value())));
+//
+//                    it.seekForPrev("key1".getBytes());
+//                    System.out.println(String.format("seek to key1's prev : %s:%s  ", new String(it.key()), new String(it.value())));
+//                    it.seekForPrev("key2".getBytes());
+//                    System.out.println(String.format("seek to key2's prev : %s:%s  ", new String(it.key()), new String(it.value())));
+//                    it.seekForPrev("key3".getBytes());
+//                    System.out.println(String.format("seek to key3's prev : %s:%s  ", new String(it.key()), new String(it.value())));
+//
+//                    it.prev();
+//                    System.out.println(String.format("seek to key2's prev : %s:%s  ", new String(it.key()), new String(it.value())));
+//                    it.prev();
+//                    System.out.println(String.format("seek to key1's prev : %s:%s  ", new String(it.key()), new String(it.value())));
+//
+//                    it.seekForNext("key1".getBytes());
+//                    System.out.println(String.format("seek to key1's next : %s:%s  ", new String(it.key()), new String(it.value())));
+//                    it.seekForNext("key2".getBytes());
+//                    System.out.println(String.format("seek to key2's next : %s:%s  ", new String(it.key()), new String(it.value())));
+//                    it.seekForNext("key3".getBytes());
+//                    System.out.println(String.format("seek to key3's next : %s:%s  ", new String(it.key()), new String(it.value())));
             } finally {
                 System.out.println("Done iterator!");
             }
         }
 
-        System.out.println("Removing existing key");
-        db.remove("key1");
-        assert !db.exists("key1");
-
+        if (T != null) {
+            T.join();
+        }
         System.out.println("Stopping engine");
         db.stop();
     }
