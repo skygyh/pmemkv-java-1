@@ -3,10 +3,12 @@ package examples;
 import io.pmem.pmemkv.Database;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class BasicExample {
@@ -14,7 +16,7 @@ public class BasicExample {
     private static final int PMEM_SIZE = 1073741824 / 16;
     public static void main(String[] args) {
 //        String[] supportedEngines = new String [] {"cmap", "vsmap", "vcmap", "stree", "csmap"};
-        String[] supportedEngines = new String [] { "csmap"};
+        String[] supportedEngines = new String [] {"stree"};//,  "csmap"};
         for (String engine : supportedEngines) {
             System.out.println("Starting engine " + engine);
             try {
@@ -128,6 +130,31 @@ public class BasicExample {
             }  else {
                 assert db.countBetween("key1", "key3") == 1;
             }
+            keys.clear();
+            values.clear();
+
+            //get floor entry
+            db.put("key6", "value6");
+            db.get_floor_entry("key5",  (k, v) -> {keys.add(k);values.add(v);
+                System.out.println("get ceiling entry key: " + k + "visited value:"+ v );});
+            assert keys.size() == 1;
+            assert values.size() == 1;
+            assert keys.get(0).equals("key3");
+            assert values.get(0).equals("value3");
+            keys.clear();
+            values.clear();
+
+            //get ceiling entry
+            db.get_ceiling_entry("key5",  (k, v) -> {keys.add(k);values.add(v);
+                System.out.println("get ceiling entry key: " + k + "visited value:"+ v );});
+            assert keys.size() == 1;
+            assert values.size() == 1;
+            assert keys.get(0).equals("key6");
+            assert values.get(0).equals("value6");
+            keys.clear();
+            values.clear();
+
+
 
             if (engine.equals("csmap"))  {
                  new Thread(new Runnable() {
