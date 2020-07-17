@@ -492,35 +492,35 @@ public class Database {
     }
 
     public boolean get_floor_entry(byte[] key, GetAllByteArrayCallback callback) {
-        database_get_floor_entry_bytes(pointer, key, callback);
+        return database_get_floor_entry_bytes(pointer, key, callback);
     }
 
     public boolean get_floor_entry(String key, GetAllStringCallback callback) {
-        database_get_floor_entry_string(pointer, key.getBytes(), callback);
+        return database_get_floor_entry_string(pointer, key.getBytes(), callback);
     }
 
     public boolean get_ceiling_entry(byte[] key, GetAllByteArrayCallback callback) {
-        database_get_ceiling_entry_bytes(pointer, key, callback);
+        return database_get_ceiling_entry_bytes(pointer, key, callback);
     }
 
     public boolean get_ceiling_entry(String key, GetAllStringCallback callback) {
-        database_get_ceiling_entry_string(pointer, key.getBytes(), callback);
+        return database_get_ceiling_entry_string(pointer, key.getBytes(), callback);
     }
 
     public boolean get_lower_entry(byte[] key, GetAllByteArrayCallback callback) {
-        database_get_lower_entry_bytes(pointer, key, callback);
+        return database_get_lower_entry_bytes(pointer, key, callback);
     }
 
     public boolean get_lower_entry(String key, GetAllStringCallback callback) {
-        database_get_lower_entry_string(pointer, key.getBytes(), callback);
+        return database_get_lower_entry_string(pointer, key.getBytes(), callback);
     }
 
     public boolean get_higher_entry(byte[] key, GetAllByteArrayCallback callback) {
-        database_get_higher_entry_bytes(pointer, key, callback);
+        return database_get_higher_entry_bytes(pointer, key, callback);
     }
 
     public boolean get_higer_entry(String key, GetAllStringCallback callback) {
-        database_get_higher_entry_string(pointer, key.getBytes(), callback);
+        return database_get_higher_entry_string(pointer, key.getBytes(), callback);
     }
 
     private final long pointer;
