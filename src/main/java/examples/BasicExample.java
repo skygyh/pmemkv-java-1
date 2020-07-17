@@ -160,7 +160,7 @@ public class BasicExample {
 
             //get lower entry
             boolean ret = db.get_lower_entry("key5",  (k, v) -> {keys.add(k);values.add(v);
-                System.out.println("get floor entry key: " + k + "visited value:"+ v );});
+                System.out.println("get lower entry key: " + k + "visited value:"+ v );});
             assert keys.size() == 1;
             assert values.size() == 1;
             assert keys.get(0).equals("key3");
@@ -171,8 +171,8 @@ public class BasicExample {
             ret = false;
 
             //get higher entry
-            ret = db.get_ceiling_entry("key5",  (k, v) -> {keys.add(k);values.add(v);
-                System.out.println("get ceiling entry key: " + k + "visited value:"+ v );});
+            ret = db.get_higher_entry("key5",  (k, v) -> {keys.add(k);values.add(v);
+                System.out.println("get higher entry key: " + k + "visited value:"+ v );});
             assert keys.size() == 1;
             assert values.size() == 1;
             assert keys.get(0).equals("key6");
@@ -183,8 +183,8 @@ public class BasicExample {
             ret = true;
 
             //get higher entry
-            ret = db.get_ceiling_entry("key5",  (k, v) -> {keys.add(k);values.add(v);
-                System.out.println("get ceiling entry key: " + k + "visited value:"+ v );});
+            ret = db.get_higher_entry("key6",  (k, v) -> {keys.add(k);values.add(v);
+                System.out.println("get higher  entry key: " + k + "visited value:"+ v );});
             assert keys.size() == 0;
             assert values.size() == 0;
             assert ret == false;
