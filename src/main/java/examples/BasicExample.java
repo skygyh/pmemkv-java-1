@@ -135,26 +135,62 @@ public class BasicExample {
 
             //get floor entry
             db.put("key6", "value6");
-            db.get_floor_entry("key5",  (k, v) -> {keys.add(k);values.add(v);
+            boolean ret = db.get_floor_entry("key5",  (k, v) -> {keys.add(k);values.add(v);
                 System.out.println("get floor entry key: " + k + "visited value:"+ v );});
             assert keys.size() == 1;
             assert values.size() == 1;
             assert keys.get(0).equals("key3");
             assert values.get(0).equals("value3");
+            assert ret == true;
             keys.clear();
             values.clear();
+            ret = false;
 
             //get ceiling entry
-            db.get_ceiling_entry("key5",  (k, v) -> {keys.add(k);values.add(v);
+            ret = db.get_ceiling_entry("key5",  (k, v) -> {keys.add(k);values.add(v);
                 System.out.println("get ceiling entry key: " + k + "visited value:"+ v );});
             assert keys.size() == 1;
             assert values.size() == 1;
             assert keys.get(0).equals("key6");
             assert values.get(0).equals("value6");
+            assert ret == true;
             keys.clear();
             values.clear();
+            ret = false;
 
+            //get lower entry
+            boolean ret = db.get_lower_entry("key5",  (k, v) -> {keys.add(k);values.add(v);
+                System.out.println("get floor entry key: " + k + "visited value:"+ v );});
+            assert keys.size() == 1;
+            assert values.size() == 1;
+            assert keys.get(0).equals("key3");
+            assert values.get(0).equals("value3");
+            assert ret == true;
+            keys.clear();
+            values.clear();
+            ret = false;
 
+            //get higher entry
+            ret = db.get_ceiling_entry("key5",  (k, v) -> {keys.add(k);values.add(v);
+                System.out.println("get ceiling entry key: " + k + "visited value:"+ v );});
+            assert keys.size() == 1;
+            assert values.size() == 1;
+            assert keys.get(0).equals("key6");
+            assert values.get(0).equals("value6");
+            assert ret == true;
+            keys.clear();
+            values.clear();
+            ret = true;
+
+            //get higher entry
+            ret = db.get_ceiling_entry("key5",  (k, v) -> {keys.add(k);values.add(v);
+                System.out.println("get ceiling entry key: " + k + "visited value:"+ v );});
+            assert keys.size() == 0;
+            assert values.size() == 0;
+            assert ret == false;
+            keys.clear();
+            values.clear();
+            ret = false;
 
             if (engine.equals("csmap"))  {
                  new Thread(new Runnable() {
