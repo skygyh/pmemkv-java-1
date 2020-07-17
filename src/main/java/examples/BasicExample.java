@@ -159,7 +159,7 @@ public class BasicExample {
             ret = false;
 
             //get lower entry
-            boolean ret = db.get_lower_entry("key5",  (k, v) -> {keys.add(k);values.add(v);
+             ret = db.get_lower_entry("key5",  (k, v) -> {keys.add(k);values.add(v);
                 System.out.println("get lower entry key: " + k + "visited value:"+ v );});
             assert keys.size() == 1;
             assert values.size() == 1;

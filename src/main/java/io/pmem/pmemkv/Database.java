@@ -519,7 +519,7 @@ public class Database {
         return database_get_higher_entry_bytes(pointer, key, callback);
     }
 
-    public boolean get_higer_entry(String key, GetAllStringCallback callback) {
+    public boolean get_higher_entry(String key, GetAllStringCallback callback) {
         return database_get_higher_entry_string(pointer, key.getBytes(), callback);
     }
 
