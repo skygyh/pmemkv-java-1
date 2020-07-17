@@ -491,20 +491,36 @@ public class Database {
 
     }
 
-    public void get_floor_entry(byte[] key, GetAllByteArrayCallback callback) {
+    public boolean get_floor_entry(byte[] key, GetAllByteArrayCallback callback) {
         database_get_floor_entry_bytes(pointer, key, callback);
     }
 
-    public void get_floor_entry(String key, GetAllStringCallback callback) {
+    public boolean get_floor_entry(String key, GetAllStringCallback callback) {
         database_get_floor_entry_string(pointer, key.getBytes(), callback);
     }
 
-    public void get_ceiling_entry(byte[] key, GetAllByteArrayCallback callback) {
+    public boolean get_ceiling_entry(byte[] key, GetAllByteArrayCallback callback) {
         database_get_ceiling_entry_bytes(pointer, key, callback);
     }
 
-    public void get_ceiling_entry(String key, GetAllStringCallback callback) {
+    public boolean get_ceiling_entry(String key, GetAllStringCallback callback) {
         database_get_ceiling_entry_string(pointer, key.getBytes(), callback);
+    }
+
+    public boolean get_lower_entry(byte[] key, GetAllByteArrayCallback callback) {
+        database_get_lower_entry_bytes(pointer, key, callback);
+    }
+
+    public boolean get_lower_entry(String key, GetAllStringCallback callback) {
+        database_get_lower_entry_string(pointer, key.getBytes(), callback);
+    }
+
+    public boolean get_higher_entry(byte[] key, GetAllByteArrayCallback callback) {
+        database_get_higher_entry_bytes(pointer, key, callback);
+    }
+
+    public boolean get_higer_entry(String key, GetAllStringCallback callback) {
+        database_get_higher_entry_string(pointer, key.getBytes(), callback);
     }
 
     private final long pointer;
@@ -582,11 +598,19 @@ public class Database {
     private native byte[] database_iterator_value_bytes(long ptr, long it_ptr);
     private native void database_iterator_delete(long ptr, long it_ptr);
 
-    private native void database_get_floor_entry_bytes(long ptr, byte[] k, GetAllByteArrayCallback cb);
-    private native void database_get_floor_entry_string(long ptr, byte[] k, GetAllStringCallback cb);
+    private native boolean database_get_floor_entry_bytes(long ptr, byte[] k, GetAllByteArrayCallback cb);
+    private native boolean database_get_floor_entry_string(long ptr, byte[] k, GetAllStringCallback cb);
 
-    private native void database_get_ceiling_entry_bytes(long ptr, byte[] k, GetAllByteArrayCallback cb);
-    private native void database_get_ceiling_entry_string(long ptr, byte[] k, GetAllStringCallback cb);
+    private native boolean database_get_ceiling_entry_bytes(long ptr, byte[] k, GetAllByteArrayCallback cb);
+    private native boolean database_get_ceiling_entry_string(long ptr, byte[] k, GetAllStringCallback cb);
+
+
+    private native boolean database_get_lower_entry_bytes(long ptr, byte[] k, GetAllByteArrayCallback cb);
+    private native boolean database_get_lower_entry_string(long ptr, byte[] k, GetAllStringCallback cb);
+
+    private native boolean database_get_higher_entry_bytes(long ptr, byte[] k, GetAllByteArrayCallback cb);
+    private native boolean database_get_higher_entry_string(long ptr, byte[] k, GetAllStringCallback cb);
+
 
     static {
         System.loadLibrary("pmemkv-jni");

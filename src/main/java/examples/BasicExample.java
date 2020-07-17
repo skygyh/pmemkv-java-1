@@ -136,7 +136,7 @@ public class BasicExample {
             //get floor entry
             db.put("key6", "value6");
             db.get_floor_entry("key5",  (k, v) -> {keys.add(k);values.add(v);
-                System.out.println("get ceiling entry key: " + k + "visited value:"+ v );});
+                System.out.println("get floor entry key: " + k + "visited value:"+ v );});
             assert keys.size() == 1;
             assert values.size() == 1;
             assert keys.get(0).equals("key3");
