@@ -237,7 +237,7 @@ public class DatabaseTest {
             Assert.fail();
         } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("Failed to open pmemkv"); // XXX
+            expect(kve.getMessage()).toEqual("Failed to pmemkv_open with status INVALID ARGUMENT"); // XXX
         } catch (Exception e) {
             Assert.fail();
         }
@@ -267,7 +267,7 @@ public class DatabaseTest {
             Assert.fail();
         } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("Failed to open pmemkv"); // XXX
+            expect(kve.getMessage()).toEqual("Failed to pmemkv_open with status WRONG ENGINE NAME"); // XXX
         } catch (Exception e) {
             Assert.fail();
         }
@@ -282,7 +282,7 @@ public class DatabaseTest {
             Assert.fail();
         } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("Failed to open pmemkv"); // XXX
+            expect(kve.getMessage()).toEqual("Failed to pmemkv_open with status INVALID ARGUMENT"); // XXX
         } catch (Exception e) {
             Assert.fail();
         }
@@ -297,7 +297,7 @@ public class DatabaseTest {
             Assert.fail();
         } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("Failed to open pmemkv"); // XXX
+            expect(kve.getMessage()).toEqual("Failed to pmemkv_open with status INVALID ARGUMENT"); // XXX
         } catch (Exception e) {
             Assert.fail();
         }
