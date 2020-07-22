@@ -15,8 +15,7 @@ public class BasicExample {
     private static final String PMEM_ROOT_PATH = "/mnt/mem";
     private static final int PMEM_SIZE = 1073741824 / 16;
     public static void main(String[] args) {
-//        String[] supportedEngines = new String [] {"cmap", "vsmap", "vcmap", "stree", "csmap"};
-        String[] supportedEngines = new String [] {"stree"};//,  "csmap"};
+        String[] supportedEngines = new String [] {"cmap", "vsmap", "vcmap", "stree"};// "csmap"};
         for (String engine : supportedEngines) {
             System.out.println("Starting engine " + engine);
             try {
